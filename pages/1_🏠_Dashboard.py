@@ -1,3 +1,7 @@
+import streamlit as st
+import sqlite3
+import pandas as pd
+
 st.markdown("""
 <div style="
 background: linear-gradient(
@@ -19,9 +23,6 @@ Helping retailers make smarter credit decisions.
 
 </div>
 """, unsafe_allow_html=True)
-import streamlit as st
-import sqlite3
-import pandas as pd
 
 st.title("📊 Dashboard")
 st.markdown("""
