@@ -24,6 +24,22 @@ Helping retailers make smarter credit decisions.
 </div>
 """, unsafe_allow_html=True)
 
+col1, col2 = st.columns(2)
+
+with col1:
+    st.success("""
+    ✅ Healthy Portfolio
+    
+    Most customers are repaying on time.
+    """)
+
+with col2:
+    st.info("""
+    📈 Credit Activity
+    
+    Collections are increasing this month.
+    """)
+
 st.title("📊 Dashboard")
 st.markdown("""
 ### Welcome Back 👋

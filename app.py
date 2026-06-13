@@ -70,6 +70,9 @@ st.sidebar.markdown("""
 ### Credit Intelligence Platform
 
 ---
+
+Built for Local Retailers
+
 """)
 
 st.markdown("""
