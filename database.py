@@ -29,3 +29,11 @@ CREATE TABLE IF NOT EXISTS credit_transactions(
     remarks TEXT
 )
 """)
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS payments(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER,
+    amount REAL,
+    payment_date TEXT
+)
+""")
