@@ -17,3 +17,15 @@ def create_tables():
     conn.close()
 
 create_tables()
+conn = sqlite3.connect("credpulse.db")
+cursor = conn.cursor()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS credit_transactions(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER,
+    amount REAL,
+    transaction_date TEXT,
+    due_date TEXT,
+    remarks TEXT
+)
+""")
