@@ -88,8 +88,22 @@ ON customers.id = credit_transactions.customer_id
 
 st.subheader("All Credit Transactions")
 
-st.dataframe(
+import pandas as pd
+
+df = pd.DataFrame(
     transactions,
+    columns=[
+        "Transaction ID",
+        "Customer",
+        "Amount (₹)",
+        "Transaction Date",
+        "Due Date",
+        "Remarks"
+    ]
+)
+
+st.dataframe(
+    df,
     use_container_width=True
 )
 
