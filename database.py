@@ -37,3 +37,7 @@ CREATE TABLE IF NOT EXISTS payments(
     payment_date TEXT
 )
 """)
+conn.commit()
+conn.close()
+
+create_tables()
