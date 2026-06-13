@@ -1,7 +1,12 @@
 import streamlit as st
 import sqlite3
 
-st.title("🎯 Decision Center")
+st.markdown("""
+# 🎯 Credit Decision Engine
+
+Assess customer creditworthiness and receive
+intelligent lending recommendations.
+""")
 
 conn = sqlite3.connect("credpulse.db")
 
@@ -19,6 +24,23 @@ selected_customer = st.selectbox(
     "Select Customer",
     customer_names
 )
+st.markdown(f"""
+<div style="
+background:#1E293B;
+padding:20px;
+border-radius:16px;
+margin-bottom:20px;
+">
+
+### 👤 Customer Profile
+
+Selected Customer: **{selected_customer}**
+
+Analysis is generated using credit,
+payment and outstanding balance history.
+
+</div>
+""", unsafe_allow_html=True)
 
 customer_id = next(
     customer[0]

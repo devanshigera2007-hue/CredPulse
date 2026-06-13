@@ -1,8 +1,35 @@
+st.markdown("""
+<div style="
+background: linear-gradient(
+90deg,
+#4F46E5,
+#7C3AED
+);
+padding:25px;
+border-radius:18px;
+margin-bottom:20px;
+">
+<h2 style="color:white;">
+🚀 CredPulse Intelligence Hub
+</h2>
+
+<p style="color:white;">
+Helping retailers make smarter credit decisions.
+</p>
+
+</div>
+""", unsafe_allow_html=True)
 import streamlit as st
 import sqlite3
 import pandas as pd
 
 st.title("📊 Dashboard")
+st.markdown("""
+### Welcome Back 👋
+
+Monitor customer credit exposure, repayment activity,
+and business health from a single dashboard.
+""")
 
 conn = sqlite3.connect("credpulse.db")
 
