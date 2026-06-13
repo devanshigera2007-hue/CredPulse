@@ -1,6 +1,5 @@
 import streamlit as st
 import sqlite3
-import plotly.graph_objects as go
 
 st.title("🎯 Decision Center")
 
@@ -114,20 +113,7 @@ if risk == "MEDIUM":
 if risk == "HIGH":
     gauge_color = "red"
 
-fig = go.Figure(go.Indicator(
-    mode="gauge+number",
-    value=trust_score,
-    title={"text": "Trust Score"},
-    gauge={
-    "axis": {"range": [0, 100]},
-    "bar": {"color": gauge_color}
-}
-))
 
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
 st.divider()
 
 st.subheader("Recommendation")
