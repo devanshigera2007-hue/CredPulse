@@ -9,19 +9,21 @@ customers = conn.execute(
     "SELECT id,name FROM customers"
 ).fetchall()
 
-customer_dict = {
-    customer[1]: customer[0]
-    for customer in customers
-}
+if not customers:
+    st.warning("Please add a customer first.")
+    st.stop()
+
+customer_names = [customer[1] for customer in customers]
 
 selected_customer = st.selectbox(
-    "Customer",
-    list(customer_dict.keys())
+    "Select Customer",
+    customer_names
 )
 
 amount = st.number_input(
-    "Credit Amount",
-    min_value=0.0
+    "Credit Amount (₹)",
+    min_value=0.0,
+    step=100.0
 )
 
 transaction_date = st.date_input(
@@ -38,14 +40,26 @@ remarks = st.text_area(
 
 if st.button("Add Credit Transaction"):
 
+    customer_id = next(
+        customer[0]
+        for customer in customers
+        if customer[1] == selected_customer
+    )
+
     conn.execute(
         """
         INSERT INTO credit_transactions
-        (customer_id,amount,transaction_date,due_date,remarks)
+        (
+            customer_id,
+            amount,
+            transaction_date,
+            due_date,
+            remarks
+        )
         VALUES (?,?,?,?,?)
         """,
         (
-            customer_dict[selected_customer],
+            customer_id,
             amount,
             str(transaction_date),
             str(due_date),
@@ -55,6 +69,28 @@ if st.button("Add Credit Transaction"):
 
     conn.commit()
 
-    st.success("Transaction Added")
+    st.success("Credit Transaction Added Successfully")
+
+st.divider()
+
+transactions = conn.execute("""
+SELECT
+credit_transactions.id,
+customers.name,
+credit_transactions.amount,
+credit_transactions.transaction_date,
+credit_transactions.due_date,
+credit_transactions.remarks
+FROM credit_transactions
+JOIN customers
+ON customers.id = credit_transactions.customer_id
+""").fetchall()
+
+st.subheader("All Credit Transactions")
+
+st.dataframe(
+    transactions,
+    use_container_width=True
+)
 
 conn.close()
