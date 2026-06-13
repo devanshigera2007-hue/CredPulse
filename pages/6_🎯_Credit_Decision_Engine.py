@@ -106,13 +106,22 @@ with col3:
 
     else:
         st.error("🔴 HIGH RISK")
+        gauge_color = "green"
+
+if risk == "MEDIUM":
+    gauge_color = "orange"
+
+if risk == "HIGH":
+    gauge_color = "red"
+
 fig = go.Figure(go.Indicator(
     mode="gauge+number",
     value=trust_score,
     title={"text": "Trust Score"},
     gauge={
-        "axis": {"range": [0, 100]}
-    }
+    "axis": {"range": [0, 100]},
+    "bar": {"color": gauge_color}
+}
 ))
 
 st.plotly_chart(
@@ -122,7 +131,43 @@ st.plotly_chart(
 st.divider()
 
 st.subheader("Recommendation")
+st.divider()
 
-st.success(recommendation)
+st.subheader("📊 Score Breakdown")
+
+st.write("""
+Trust Score is calculated using:
+
+• Repayment Behaviour (40%)
+
+• Outstanding Credit Exposure (40%)
+
+• Transaction History (20%)
+
+Customers with lower outstanding balances and stronger repayment records receive higher trust scores.
+""")
+
+if risk == "LOW":
+    st.success("""
+Customer has maintained a healthy repayment profile.
+
+Current outstanding amount is manageable.
+
+Additional credit may be extended safely.
+""")
+
+elif risk == "MEDIUM":
+    st.warning("""
+Customer has moderate outstanding dues.
+
+Extend additional credit carefully and monitor repayments.
+""")
+
+else:
+    st.error("""
+Customer has elevated credit risk.
+
+Further credit extension is not recommended.
+""")
 
 conn.close()

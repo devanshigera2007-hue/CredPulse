@@ -1,44 +1,102 @@
 import streamlit as st
+import sqlite3
+import pandas as pd
 
 st.title("📊 Dashboard")
+
+conn = sqlite3.connect("credpulse.db")
+
+# Total Customers
+total_customers = conn.execute(
+    "SELECT COUNT(*) FROM customers"
+).fetchone()[0]
+
+# Total Credit Given
+total_credit = conn.execute(
+    """
+    SELECT COALESCE(SUM(amount),0)
+    FROM credit_transactions
+    """
+).fetchone()[0]
+
+# Total Payments Received
+total_payments = conn.execute(
+    """
+    SELECT COALESCE(SUM(amount),0)
+    FROM payments
+    """
+).fetchone()[0]
+
+# Outstanding Amount
+outstanding = total_credit - total_payments
+
+# Collection Rate
+if total_credit > 0:
+    collection_rate = round(
+        (total_payments / total_credit) * 100,
+        1
+    )
+else:
+    collection_rate = 0
+
+# KPI Cards
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.metric(
         "Outstanding Credit",
-        "₹28,500",
-        "+12%"
+        f"₹{outstanding:.0f}"
     )
 
 with col2:
     st.metric(
         "Customers",
-        "47",
-        "+5"
+        total_customers
     )
 
 with col3:
     st.metric(
-        "Overdue Amount",
-        "₹4,200",
-        "-8%"
+        "Total Credit",
+        f"₹{total_credit:.0f}"
     )
 
 with col4:
     st.metric(
         "Collection Rate",
-        "88%",
-        "+3%"
+        f"{collection_rate}%"
     )
 
 st.divider()
 
-st.subheader("Business Overview")
+# Recent Credit Transactions
 
-st.line_chart(
-    {
-        "Credit Issued":[1000,2000,1500,3000,2500,4000],
-        "Collections":[500,1800,1200,2800,2200,3500]
-    }
+st.subheader("Recent Credit Transactions")
+
+transactions = conn.execute("""
+SELECT
+customers.name,
+credit_transactions.amount,
+credit_transactions.transaction_date
+FROM credit_transactions
+JOIN customers
+ON customers.id = credit_transactions.customer_id
+ORDER BY credit_transactions.id DESC
+LIMIT 10
+""").fetchall()
+
+df = pd.DataFrame(
+    transactions,
+    columns=[
+        "Customer",
+        "Amount",
+        "Date"
+    ]
 )
+
+st.dataframe(
+    df,
+    use_container_width=True
+)
+
+conn.close()
