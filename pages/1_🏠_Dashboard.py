@@ -2,57 +2,16 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 
-st.markdown("""
-<div style="
-background: linear-gradient(135deg,#7C3AED,#A855F7);
-padding:30px;
-border-radius:20px;
-margin-bottom:25px;
-">
-
-<h1 style="color:white;margin:0;">
-💳 CredPulse
-</h1>
-
-<p style="color:white;font-size:18px;">
-Smarter Credit Decisions for Local Retailers
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.success("""
-    ✅ Healthy Portfolio
-    
-    Most customers are repaying on time.
-    """)
-
-with col2:
-    st.info("""
-    📈 Credit Activity
-    
-    Collections are increasing this month.
-    """)
-
-st.title("📊 Dashboard")
-st.markdown("""
-### Welcome Back 👋
-
-Monitor customer credit exposure, repayment activity,
-and business health from a single dashboard.
-""")
-
 conn = sqlite3.connect("credpulse.db")
 
-# Total Customers
+# -------------------------
+# DATA
+# -------------------------
+
 total_customers = conn.execute(
     "SELECT COUNT(*) FROM customers"
 ).fetchone()[0]
 
-# Total Credit Given
 total_credit = conn.execute(
     """
     SELECT COALESCE(SUM(amount),0)
@@ -60,7 +19,6 @@ total_credit = conn.execute(
     """
 ).fetchone()[0]
 
-# Total Payments Received
 total_payments = conn.execute(
     """
     SELECT COALESCE(SUM(amount),0)
@@ -68,10 +26,8 @@ total_payments = conn.execute(
     """
 ).fetchone()[0]
 
-# Outstanding Amount
 outstanding = total_credit - total_payments
 
-# Collection Rate
 if total_credit > 0:
     collection_rate = round(
         (total_payments / total_credit) * 100,
@@ -80,14 +36,50 @@ if total_credit > 0:
 else:
     collection_rate = 0
 
-# KPI Cards
+# -------------------------
+# HERO SECTION
+# -------------------------
 
-col1, col2, col3, col4 = st.columns(4)
+st.markdown("""
+<div style="
+background:linear-gradient(135deg,#6D28D9,#9333EA);
+padding:35px;
+border-radius:25px;
+margin-bottom:25px;
+box-shadow:0px 8px 25px rgba(0,0,0,0.3);
+">
+
+<h1 style="
+color:white;
+margin:0;
+font-size:52px;
+">
+💳 CredPulse
+</h1>
+
+<p style="
+color:white;
+font-size:20px;
+margin-top:10px;
+">
+Credit Intelligence Platform for Local Retailers
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("## Welcome Back 👋")
+
+# -------------------------
+# KPI CARDS
+# -------------------------
+
+col1,col2,col3,col4 = st.columns(4)
 
 with col1:
     st.metric(
         "Outstanding Credit",
-        f"₹{outstanding:.0f}"
+        f"₹{outstanding:,.0f}"
     )
 
 with col2:
@@ -98,8 +90,8 @@ with col2:
 
 with col3:
     st.metric(
-        "Total Credit",
-        f"₹{total_credit:.0f}"
+        "Credit Issued",
+        f"₹{total_credit:,.0f}"
     )
 
 with col4:
@@ -108,11 +100,35 @@ with col4:
         f"{collection_rate}%"
     )
 
+st.write("")
+
+# -------------------------
+# ALERT CARDS
+# -------------------------
+
+col1,col2 = st.columns(2)
+
+with col1:
+    st.success("""
+### Healthy Portfolio
+
+Most customers are repaying on time.
+""")
+
+with col2:
+    st.info("""
+### Business Insight
+
+Collections are improving this month.
+""")
+
 st.divider()
 
-# Recent Credit Transactions
+# -------------------------
+# TRANSACTIONS TABLE
+# -------------------------
 
-st.subheader("Recent Credit Transactions")
+st.subheader("📋 Recent Credit Transactions")
 
 transactions = conn.execute("""
 SELECT
@@ -130,7 +146,7 @@ df = pd.DataFrame(
     transactions,
     columns=[
         "Customer",
-        "Amount",
+        "Amount (₹)",
         "Date"
     ]
 )
