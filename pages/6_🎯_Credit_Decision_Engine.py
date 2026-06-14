@@ -197,37 +197,39 @@ st.write(f"**Number of Transactions:** {tx_count}")
 
 st.divider()
 
-st.subheader("📊 Score Explanation")
+st.subheader("📊 Score Factors")
 
-st.markdown(f"""
-### How the Trust Score is Calculated
+col1, col2, col3 = st.columns(3)
 
-The CredPulse Trust Score evaluates a customer's creditworthiness using three key factors:
+with col1:
+    st.success(f"""
+### 💳 Repayment
 
-#### 💰 Outstanding Balance
-- Current Outstanding: **₹{outstanding:,.0f}**
-- Customers with lower unpaid balances receive higher scores.
-- High outstanding amounts indicate greater repayment risk.
+**40% Weight**
 
-#### ✅ Repayment Behaviour
-- Total Credit Issued: **₹{total_credit:,.0f}**
-- Total Payments Made: **₹{total_payments:,.0f}**
-- Customers who consistently repay their dues earn higher trust scores.
+₹{total_payments:,.0f} repaid
 
-#### 📈 Transaction History
-- Number of Credit Transactions: **{tx_count}**
-- Customers with a longer borrowing history provide more reliable behavioural data.
-- Frequent successful transactions improve confidence in future repayments.
+Higher repayments increase trust.
+""")
 
----
+with col2:
+    st.warning(f"""
+### 📦 Exposure
 
-### Final Assessment
+**40% Weight**
 
-**Trust Score:** {score}/100
+₹{outstanding:,.0f} outstanding
 
-**Risk Category:** {risk}
+Lower exposure reduces risk.
+""")
 
-**Recommendation:** {recommendation}
+with col3:
+    st.info(f"""
+### 📈 History
 
-The system combines repayment behaviour, outstanding exposure, and transaction history to generate an overall customer trust score and credit recommendation.
+**20% Weight**
+
+{tx_count} transactions
+
+More history improves reliability.
 """)
