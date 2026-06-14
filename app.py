@@ -1,10 +1,5 @@
 import streamlit as st
 
-st.set_page_config(
-    page_title="CredPulse",
-    page_icon="💳",
-    layout="wide"
-)
 st.markdown("""
 <div style="
 background:linear-gradient(135deg,#7C3AED,#A855F7);
@@ -13,7 +8,7 @@ border-radius:25px;
 margin-bottom:30px;
 ">
 
-<h1 style="color:white;">
+<h1 style="color:white;font-size:60px;">
 💳 CredPulse
 </h1>
 
@@ -24,31 +19,29 @@ Credit Intelligence Platform for Local Retailers
 </div>
 """, unsafe_allow_html=True)
 
-col1,col2,col3 = st.columns(3)
-
-with col1:
-    st.info("👥 Customer Management")
-
-with col2:
-    st.success("💰 Credit Tracking")
-
-with col3:
-    st.warning("🎯 Smart Credit Decisions")
-
-st.markdown("---")
-
-st.header("Welcome")
+st.markdown("## Welcome")
 
 st.write("""
-CredPulse helps local retailers:
+CredPulse helps retailers:
 
 ✅ Track customer credit
 
 ✅ Monitor repayments
 
-✅ Calculate trust scores
+✅ Evaluate customer trust
 
-✅ Assess risk levels
+✅ Assess credit risk
 
 ✅ Make smarter credit decisions
 """)
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.success("👥 Customer Management")
+
+with col2:
+    st.info("💳 Credit Tracking")
+
+with col3:
+    st.warning("🎯 Decision Support")
