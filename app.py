@@ -8,12 +8,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 st.markdown("""
+
 <style>
 
-/* Background */
+/* Main App */
 
 .stApp{
-background:#FFFDF7;
+background:#0F172A;
 }
 
 /* Sidebar */
@@ -21,58 +22,78 @@ background:#FFFDF7;
 section[data-testid="stSidebar"]{
 background:linear-gradient(
 180deg,
-#7C3AED,
-#A855F7
+#111827,
+#1E293B
 );
 }
 
-/* Sidebar text */
+/* Sidebar Text */
 
 section[data-testid="stSidebar"] *{
 color:white !important;
 }
 
-/* Main headings */
+/* Headers */
 
-h1{
-color:#7C3AED !important;
-}
-
-h2{
-color:#7C3AED !important;
+h1,h2,h3{
+color:white !important;
 }
 
 /* Metric Cards */
 
 [data-testid="metric-container"]{
-background:white;
+background:#1E293B;
+border:1px solid #334155;
 padding:20px;
 border-radius:20px;
-border:2px solid #FACC15;
-box-shadow:
-0px 4px 15px rgba(0,0,0,0.08);
+box-shadow:0px 4px 20px rgba(0,0,0,0.2);
 }
 
 /* Buttons */
 
 .stButton button{
-
 background:linear-gradient(
 90deg,
 #FACC15,
-#F59E0B
+#EAB308
 );
-
 color:black;
-
-border:none;
-
-border-radius:14px;
-
 font-weight:bold;
+border:none;
+border-radius:12px;
+}
 
-padding:10px 25px;
+/* Tables */
+
+[data-testid="stDataFrame"]{
+background:#1E293B;
+border-radius:20px;
+}
+
+/* Inputs */
+
+.stTextInput input,
+.stNumberInput input{
+background:#1E293B;
+color:white;
+}
+
+/* Selectboxes */
+
+div[data-baseweb="select"]{
+background:#1E293B;
 }
 
 </style>
+
 """, unsafe_allow_html=True)
+st.sidebar.markdown("""
+
+# 💳 CredPulse
+
+### Credit Intelligence Platform
+
+---
+
+""")
+
