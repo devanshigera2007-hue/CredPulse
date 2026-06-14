@@ -1,12 +1,13 @@
+```python
 import streamlit as st
 import sqlite3
 import pandas as pd
 
 conn = sqlite3.connect("credpulse.db")
 
-# -------------------------
+# =========================
 # DATA
-# -------------------------
+# =========================
 
 total_customers = conn.execute(
     "SELECT COUNT(*) FROM customers"
@@ -36,101 +37,188 @@ if total_credit > 0:
 else:
     collection_rate = 0
 
-# -------------------------
-# HERO SECTION
-# -------------------------
+# =========================
+# CUSTOM STYLING
+# =========================
 
 st.markdown("""
-<div style="
-background:linear-gradient(135deg,#6D28D9,#9333EA);
-padding:35px;
-border-radius:25px;
-margin-bottom:25px;
-box-shadow:0px 8px 25px rgba(0,0,0,0.3);
-">
+<style>
 
-<h1 style="
+.metric-card{
+background:white;
+padding:25px;
+border-radius:20px;
+text-align:center;
+box-shadow:0px 4px 15px rgba(0,0,0,0.08);
+border:2px solid #FACC15;
+}
+
+.metric-value{
+font-size:38px;
+font-weight:bold;
+color:#7C3AED;
+}
+
+.metric-label{
+font-size:16px;
+color:#666;
+}
+
+.hero-card{
+background:linear-gradient(
+135deg,
+#7C3AED,
+#A855F7
+);
+padding:40px;
+border-radius:30px;
+margin-bottom:30px;
+box-shadow:0px 10px 30px rgba(124,58,237,0.35);
+}
+
+.hero-title{
 color:white;
-margin:0;
-font-size:52px;
-">
-💳 CredPulse
-</h1>
+font-size:56px;
+font-weight:bold;
+}
 
-<p style="
+.hero-subtitle{
 color:white;
 font-size:20px;
-margin-top:10px;
-">
-Credit Intelligence Platform for Local Retailers
-</p>
+}
+
+.info-card{
+padding:25px;
+border-radius:20px;
+color:white;
+margin-bottom:20px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
+# HERO
+# =========================
+
+st.markdown("""
+<div class="hero-card">
+
+<div class="hero-title">
+💳 CredPulse
+</div>
+
+<div class="hero-subtitle">
+AI-Powered Credit Intelligence Platform
+</div>
 
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("## Welcome Back 👋")
 
-# -------------------------
+st.caption(
+    "Monitor customer credit exposure, repayments and business performance in real time."
+)
+
+# =========================
 # KPI CARDS
-# -------------------------
+# =========================
 
 col1,col2,col3,col4 = st.columns(4)
 
 with col1:
-    st.metric(
-        "Outstanding Credit",
-        f"₹{outstanding:,.0f}"
-    )
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-value">
+        ₹{outstanding:,.0f}
+        </div>
+        <div class="metric-label">
+        Outstanding Credit
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 with col2:
-    st.metric(
-        "Customers",
-        total_customers
-    )
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-value">
+        {total_customers}
+        </div>
+        <div class="metric-label">
+        Customers
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 with col3:
-    st.metric(
-        "Credit Issued",
-        f"₹{total_credit:,.0f}"
-    )
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-value">
+        ₹{total_credit:,.0f}
+        </div>
+        <div class="metric-label">
+        Credit Issued
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 with col4:
-    st.metric(
-        "Collection Rate",
-        f"{collection_rate}%"
-    )
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-value">
+        {collection_rate}%
+        </div>
+        <div class="metric-label">
+        Collection Rate
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.write("")
 
-# -------------------------
-# ALERT CARDS
-# -------------------------
+# =========================
+# STATUS CARDS
+# =========================
 
 col1,col2 = st.columns(2)
 
 with col1:
-    st.success("""
-### Healthy Portfolio
+    st.markdown("""
+    <div class="info-card"
+    style="background:linear-gradient(135deg,#22C55E,#16A34A);">
 
-Most customers are repaying on time.
-""")
+    <h3>✅ Healthy Portfolio</h3>
+
+    <p>
+    Most customers are repaying on time.
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
 
 with col2:
-    st.info("""
-### Business Insight
+    st.markdown("""
+    <div class="info-card"
+    style="background:linear-gradient(135deg,#3B82F6,#2563EB);">
 
-Collections are improving this month.
-""")
+    <h3>📈 Business Insight</h3>
 
-st.divider()
+    <p>
+    Collections are improving this month.
+    </p>
 
-# -------------------------
-# TRANSACTIONS TABLE
-# -------------------------
+    </div>
+    """, unsafe_allow_html=True)
 
-st.subheader("📋 Recent Credit Transactions")
+# =========================
+# TRANSACTIONS
+# =========================
 
-transactions = conn.execute("""
+st.markdown("## 📋 Recent Credit Transactions")
+
+transactions = conn.execute(
+"""
 SELECT
 customers.name,
 credit_transactions.amount,
@@ -140,7 +228,8 @@ JOIN customers
 ON customers.id = credit_transactions.customer_id
 ORDER BY credit_transactions.id DESC
 LIMIT 10
-""").fetchall()
+"""
+).fetchall()
 
 df = pd.DataFrame(
     transactions,
@@ -153,7 +242,9 @@ df = pd.DataFrame(
 
 st.dataframe(
     df,
-    use_container_width=True
+    use_container_width=True,
+    hide_index=True
 )
 
 conn.close()
+```
