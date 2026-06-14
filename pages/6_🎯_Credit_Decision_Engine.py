@@ -79,7 +79,7 @@ outstanding = total_credit - total_payments
 # TRUST SCORE MODEL
 # ==================================================
 
-# Repayment Behaviour (40 Marks)
+# Repayment Behaviour (50 Marks)
 
 if total_credit > 0:
     repayment_ratio = total_payments / total_credit
@@ -87,29 +87,30 @@ else:
     repayment_ratio = 0
 
 repayment_score = min(
-    40,
-    repayment_ratio * 40
+    50,
+    repayment_ratio * 50
 )
 
-# Outstanding Exposure (40 Marks)
+# Outstanding Exposure (30 Marks)
 
-if outstanding <= 1000:
-    exposure_score = 40
-elif outstanding <= 3000:
-    exposure_score = 30
-elif outstanding <= 5000:
-    exposure_score = 20
+if total_credit > 0:
+    outstanding_ratio = outstanding / total_credit
 else:
-    exposure_score = 10
+    outstanding_ratio = 1
+
+exposure_score = max(
+    0,
+    30 - (outstanding_ratio * 30)
+)
 
 # Transaction History (20 Marks)
 
 transaction_score = min(
     20,
-    tx_count * 2
+    tx_count * 4
 )
 
-# Final Score
+# Final Trust Score
 
 trust_score = round(
     repayment_score +
@@ -126,7 +127,7 @@ trust_score = max(
 # RISK CLASSIFICATION
 # ==================================================
 
-if trust_score >= 80:
+if trust_score >= 75:
 
     risk_color = "#34d399"
     risk_bg = "rgba(52,211,153,0.1)"
@@ -146,7 +147,7 @@ if trust_score >= 80:
 
     gauge_color = "#34d399"
 
-elif trust_score >= 50:
+elif trust_score >= 45:
 
     risk_color = "#fbbf24"
     risk_bg = "rgba(251,191,36,0.1)"
@@ -399,8 +400,8 @@ margin-bottom:16px;'>
 """, unsafe_allow_html=True)
 
 score_breakdown = [
-    ("Repayment Behaviour", repayment_score, 40, "#a855f7"),
-    ("Outstanding Exposure", exposure_score, 40, "#fbbf24"),
+    ("Repayment Behaviour", repayment_score, 50, "#a855f7"),
+    ("Outstanding Exposure", exposure_score, 30, "#fbbf24"),
     ("Transaction History", transaction_score, 20, "#34d399")
 ]
 
