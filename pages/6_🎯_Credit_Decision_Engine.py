@@ -1,27 +1,12 @@
 import streamlit as st
 import sqlite3
 
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-* { font-family: 'Inter', sans-serif !important; }
-.stApp { background: #0a0a12 !important; }
-#MainMenu, footer, header { visibility: hidden; }
-.block-container { padding: 2rem 2.5rem !important; max-width: 1100px; }
-label { color: #94a3b8 !important; font-size: 13px !important; font-weight: 500 !important; }
-</style>
-""", unsafe_allow_html=True)
+st.title("🎯 Credit Decision Engine")
+st.caption("Customer trust scoring and lending recommendations")
 
-st.markdown("""
-<div style="margin-bottom:28px;">
-  <div style="font-size:26px;font-weight:800;color:#f8fafc;">
-  🎯 Credit Decision Engine
-  </div>
-  <div style="font-size:13px;color:#475569;margin-top:2px;">
-  AI-powered trust scoring and lending recommendations
-  </div>
-</div>
-""", unsafe_allow_html=True)
+# ==========================
+# DATABASE
+# ==========================
 
 conn = sqlite3.connect("credpulse.db")
 
@@ -34,7 +19,7 @@ if not customers:
     st.stop()
 
 selected_customer = st.selectbox(
-    "Select Customer to Analyse",
+    "Select Customer",
     [c[1] for c in customers]
 )
 
@@ -43,6 +28,10 @@ customer_id = next(
     for c in customers
     if c[1] == selected_customer
 )
+
+# ==========================
+# CUSTOMER DATA
+# ==========================
 
 total_credit = conn.execute(
     """
@@ -75,381 +64,145 @@ conn.close()
 
 outstanding = total_credit - total_payments
 
-# ==================================================
-# TRUST SCORE MODEL
-# ==================================================
+# ==========================
+# CREDIT SCORE MODEL
+# ==========================
 
-# Repayment Behaviour (50 Marks)
+score = 50
+
+# Outstanding balance
+
+if outstanding <= 500:
+    score += 25
+elif outstanding <= 2000:
+    score += 15
+elif outstanding <= 5000:
+    score += 5
+else:
+    score -= 20
+
+# Repayment behaviour
 
 if total_credit > 0:
-    repayment_ratio = total_payments / total_credit
-else:
-    repayment_ratio = 0
 
-repayment_score = min(
-    50,
-    repayment_ratio * 50
-)
+    repayment_ratio = (
+        total_payments / total_credit
+    )
 
-# Outstanding Exposure (30 Marks)
+    if repayment_ratio >= 0.80:
+        score += 20
 
-if total_credit > 0:
-    outstanding_ratio = outstanding / total_credit
-else:
-    outstanding_ratio = 1
+    elif repayment_ratio >= 0.50:
+        score += 10
 
-exposure_score = max(
+    elif repayment_ratio > 0:
+        score += 5
+
+    else:
+        score -= 10
+
+# Transaction history
+
+if tx_count >= 10:
+    score += 15
+
+elif tx_count >= 5:
+    score += 10
+
+elif tx_count >= 2:
+    score += 5
+
+score = max(
     0,
-    30 - (outstanding_ratio * 30)
+    min(100, round(score))
 )
 
-# Transaction History (20 Marks)
+# ==========================
+# RISK LEVEL
+# ==========================
 
-transaction_score = min(
-    20,
-    tx_count * 4
-)
+if score >= 80:
 
-# Final Trust Score
-
-trust_score = round(
-    repayment_score +
-    exposure_score +
-    transaction_score
-)
-
-trust_score = max(
-    0,
-    min(100, trust_score)
-)
-
-# ==================================================
-# RISK CLASSIFICATION
-# ==================================================
-
-if trust_score >= 75:
-
-    risk_color = "#34d399"
-    risk_bg = "rgba(52,211,153,0.1)"
-    risk_border = "rgba(52,211,153,0.25)"
-
-    risk_label = "🟢 Low Risk"
+    risk = "🟢 LOW RISK"
 
     recommendation = (
         "Safe to extend additional credit"
     )
 
-    rec_detail = (
-        "This customer has maintained a strong repayment profile "
-        "and demonstrates healthy credit behaviour. "
-        "Additional credit may be extended confidently."
-    )
+elif score >= 50:
 
-    gauge_color = "#34d399"
-
-elif trust_score >= 45:
-
-    risk_color = "#fbbf24"
-    risk_bg = "rgba(251,191,36,0.1)"
-    risk_border = "rgba(251,191,36,0.25)"
-
-    risk_label = "🟡 Medium Risk"
+    risk = "🟡 MEDIUM RISK"
 
     recommendation = (
         "Extend credit with caution"
     )
 
-    rec_detail = (
-        "This customer has moderate risk. "
-        "Consider limiting exposure and monitoring repayments closely."
-    )
-
-    gauge_color = "#fbbf24"
-
 else:
 
-    risk_color = "#f87171"
-    risk_bg = "rgba(248,113,113,0.1)"
-    risk_border = "rgba(248,113,113,0.25)"
-
-    risk_label = "🔴 High Risk"
+    risk = "🔴 HIGH RISK"
 
     recommendation = (
         "Do not extend further credit"
     )
 
-    rec_detail = (
-        "Outstanding obligations remain high relative to repayments. "
-        "Additional credit is not recommended until dues are cleared."
+# ==========================
+# DISPLAY
+# ==========================
+
+st.divider()
+
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric(
+        "Trust Score",
+        f"{score}/100"
     )
 
-    gauge_color = "#f87171"
+with col2:
+    st.metric(
+        "Outstanding",
+        f"₹{outstanding:,.0f}"
+    )
 
-# ==================================================
-# HEADER CARD
-# ==================================================
+with col3:
+    st.metric(
+        "Payments",
+        f"₹{total_payments:,.0f}"
+    )
 
-st.markdown("<br>", unsafe_allow_html=True)
+with col4:
+    st.metric(
+        "Transactions",
+        tx_count
+    )
 
-st.markdown(f"""
-<div style="
-background:linear-gradient(135deg,#0f0f1f,#1a0a2e);
-border:1px solid rgba(124,58,237,0.3);
-border-radius:20px;
-padding:32px;
-margin-bottom:24px;
-display:flex;
-align-items:center;
-gap:32px;
-">
+st.divider()
 
-<div style="flex-shrink:0;text-align:center;">
+st.subheader("Risk Assessment")
+st.write(risk)
 
-<div style="
-width:110px;
-height:110px;
-border-radius:50%;
-background:conic-gradient(
-{gauge_color} {trust_score * 3.6}deg,
-rgba(255,255,255,0.06) 0deg
-);
-display:flex;
-align-items:center;
-justify-content:center;
-">
+st.subheader("Recommendation")
+st.info(recommendation)
 
-<div style="
-width:82px;
-height:82px;
-border-radius:50%;
-background:#0a0a12;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-">
+st.divider()
 
-<div style="
-font-size:26px;
-font-weight:800;
-color:{gauge_color};
-line-height:1;
-">
-{trust_score}
-</div>
+st.subheader("Credit Summary")
 
-<div style="
-font-size:10px;
-color:#475569;
-">
-/100
-</div>
+st.write(f"**Customer:** {selected_customer}")
+st.write(f"**Total Credit Issued:** ₹{total_credit:,.0f}")
+st.write(f"**Total Payments:** ₹{total_payments:,.0f}")
+st.write(f"**Outstanding Balance:** ₹{outstanding:,.0f}")
+st.write(f"**Number of Transactions:** {tx_count}")
 
-</div>
-</div>
+st.divider()
 
-<div style="
-font-size:11px;
-color:#475569;
-margin-top:8px;
-text-transform:uppercase;
-letter-spacing:0.08em;
-">
-Trust Score
-</div>
+st.subheader("Score Explanation")
 
-</div>
-
-<div style="flex:1;">
-
-<div style="
-font-size:11px;
-color:#7c3aed;
-font-weight:600;
-text-transform:uppercase;
-letter-spacing:0.1em;
-margin-bottom:6px;
-">
-Customer Analysis
-</div>
-
-<div style="
-font-size:20px;
-font-weight:800;
-color:#f8fafc;
-margin-bottom:8px;
-">
-{selected_customer}
-</div>
-
-<div style="
-display:inline-block;
-background:{risk_bg};
-border:1px solid {risk_border};
-color:{risk_color};
-padding:4px 14px;
-border-radius:999px;
-font-size:12px;
-font-weight:700;
-margin-bottom:14px;
-">
-{risk_label}
-</div>
-
-<div style="
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:12px;
-margin-top:8px;
-">
-
-<div style="
-background:rgba(255,255,255,0.04);
-border-radius:10px;
-padding:12px;
-">
-<div style="font-size:10px;color:#475569;">Outstanding</div>
-<div style="font-size:17px;font-weight:700;color:#fbbf24;">
-₹{outstanding:,.0f}
-</div>
-</div>
-
-<div style="
-background:rgba(255,255,255,0.04);
-border-radius:10px;
-padding:12px;
-">
-<div style="font-size:10px;color:#475569;">Total Paid</div>
-<div style="font-size:17px;font-weight:700;color:#34d399;">
-₹{total_payments:,.0f}
-</div>
-</div>
-
-<div style="
-background:rgba(255,255,255,0.04);
-border-radius:10px;
-padding:12px;
-">
-<div style="font-size:10px;color:#475569;">Transactions</div>
-<div style="font-size:17px;font-weight:700;color:#a78bfa;">
-{tx_count}
-</div>
-</div>
-
-</div>
-</div>
-</div>
-""", unsafe_allow_html=True)
-
-# ==================================================
-# RECOMMENDATION
-# ==================================================
-
-st.markdown(f"""
-<div style="
-background:{risk_bg};
-border:1px solid {risk_border};
-border-left:4px solid {risk_color};
-border-radius:16px;
-padding:24px;
-margin-bottom:24px;
-">
-
-<div style="
-font-size:11px;
-font-weight:600;
-color:{risk_color};
-text-transform:uppercase;
-letter-spacing:0.1em;
-margin-bottom:8px;
-">
-📋 Recommendation
-</div>
-
-<div style="
-font-size:18px;
-font-weight:700;
-color:white;
-margin-bottom:8px;
-">
-{recommendation}
-</div>
-
-<div style="
-font-size:13px;
-color:rgba(255,255,255,0.6);
-line-height:1.6;
-">
-{rec_detail}
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-# ==================================================
-# SCORE BREAKDOWN
-# ==================================================
-
-st.markdown("""
-<div style='font-size:15px;
-font-weight:700;
-color:#cbd5e1;
-margin-bottom:16px;'>
-📊 Score Breakdown
-</div>
-""", unsafe_allow_html=True)
-
-score_breakdown = [
-    ("Repayment Behaviour", repayment_score, 50, "#a855f7"),
-    ("Outstanding Exposure", exposure_score, 30, "#fbbf24"),
-    ("Transaction History", transaction_score, 20, "#34d399")
-]
-
-for label, score, maximum, color in score_breakdown:
-
-    percentage = (score / maximum) * 100
-
-    st.markdown(f"""
-    <div style="margin-bottom:14px;">
-
-      <div style="
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:6px;
-      ">
-        <span style="font-size:13px;color:#94a3b8;">
-        {label}
-        </span>
-
-        <span style="
-        font-size:12px;
-        font-weight:600;
-        color:{color};
-        ">
-        {score:.0f}/{maximum}
-        </span>
-      </div>
-
-      <div style="
-      background:rgba(255,255,255,0.06);
-      border-radius:999px;
-      height:6px;
-      overflow:hidden;
-      ">
-
-        <div style="
-        width:{percentage}%;
-        height:100%;
-        background:linear-gradient(
-        90deg,
-        {color}88,
-        {color}
-        );
-        border-radius:999px;
-        ">
-        </div>
-
-      </div>
-
-    </div>
-    """, unsafe_allow_html=True)
+st.write("""
+- Base Score = 50
+- Lower outstanding balance increases score
+- Better repayment history increases score
+- More transaction history increases score
+- Final score is capped between 0 and 100
+""")
