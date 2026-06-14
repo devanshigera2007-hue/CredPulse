@@ -4,28 +4,17 @@ import pandas as pd
 
 st.markdown("""
 <div style="
-background:
-linear-gradient(
-135deg,
-#7C3AED,
-#A855F7
-);
-
-padding:35px;
-
-border-radius:25px;
-
+background: linear-gradient(135deg,#7C3AED,#A855F7);
+padding:30px;
+border-radius:20px;
 margin-bottom:25px;
 ">
 
-<h1 style="color:white;">
+<h1 style="color:white;margin:0;">
 💳 CredPulse
 </h1>
 
-<p style="
-color:white;
-font-size:18px;
-">
+<p style="color:white;font-size:18px;">
 Smarter Credit Decisions for Local Retailers
 </p>
 
