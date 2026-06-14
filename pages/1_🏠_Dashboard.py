@@ -4,21 +4,29 @@ import pandas as pd
 
 st.markdown("""
 <div style="
-background: linear-gradient(
-90deg,
-#4F46E5,
-#7C3AED
+background:
+linear-gradient(
+135deg,
+#7C3AED,
+#A855F7
 );
-padding:25px;
-border-radius:18px;
-margin-bottom:20px;
-">
-<h2 style="color:white;">
-🚀 CredPulse Intelligence Hub
-</h2>
 
-<p style="color:white;">
-Helping retailers make smarter credit decisions.
+padding:35px;
+
+border-radius:25px;
+
+margin-bottom:25px;
+">
+
+<h1 style="color:white;">
+💳 CredPulse
+</h1>
+
+<p style="
+color:white;
+font-size:18px;
+">
+Smarter Credit Decisions for Local Retailers
 </p>
 
 </div>
