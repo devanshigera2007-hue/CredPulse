@@ -1,5 +1,6 @@
 import streamlit as st
 import sqlite3
+import database  # ensures shop_profile table is created before we query it
 
 st.markdown("""
 <style>
@@ -41,7 +42,7 @@ with sqlite3.connect("credpulse.db") as conn:
     profile = conn.execute("SELECT * FROM shop_profile LIMIT 1").fetchone()
 
 if not profile:
-    st.warning("No profile found. Please restart the app to set one up.")
+    st.warning("No profile found. Please go to the home page to set one up.")
     st.stop()
 
 _, db_shop, db_owner, db_city, db_phone, db_upi = profile
@@ -129,7 +130,7 @@ if st.button("🗑️  Reset Shop Profile"):
     with sqlite3.connect("credpulse.db") as conn:
         conn.execute("DELETE FROM shop_profile")
         conn.commit()
-    st.warning("Profile reset. Refresh the app to set up again.")
+    st.warning("Profile reset. Go to the home page to set up again.")
     st.rerun()
 
 st.markdown("</div>", unsafe_allow_html=True)
